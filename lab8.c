@@ -17,7 +17,7 @@ bool redFound = false;
 
 //BYTE *currentImage;
 
-int servoPos = 0;
+int servoPos = 128;
 SERVOSet(1, servoPos);
 int increment = 1;
 BYTE img[QVGA_SIZE];
@@ -30,6 +30,8 @@ int redFoundServoPosition = 0;
 
 void setup()
 {
+	SERVOSet(1,servoPos);
+	
 	//mark this location as home
 	VWGetPosition(&homeLocationX, &homeLocationY, &homeLocatoinPhi);
 
@@ -62,6 +64,7 @@ int scanForRed(BYTE img)
 	int red;
 	int blue;
 	servoPos = servoPos + increment;
+	SERVOSet(1, servoPos);
 	
 	for(int i = 0; i < X_1; i++){
 		for(int j = 0; i < Y_1; j++) {
