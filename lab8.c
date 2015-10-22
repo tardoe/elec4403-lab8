@@ -21,7 +21,7 @@ bool redMaximised = false;
 
 //BYTE *currentImage;
 
-int servoPos = 0;
+int servoPos = 128;
 int increment = 1;
 BYTE img[QVGA_SIZE];
 
@@ -33,6 +33,8 @@ int redFoundServoPosition = 0;
 
 void setup()
 {
+	SERVOSet(1,servoPos);
+	
 	//mark this location as home
 	VWGetPosition(&homeLocationX, &homeLocationY, &homeLocatoinPhi);
 
@@ -48,14 +50,33 @@ int searchForRed(BYTE img)
 	int numRed = 0;
 	int red;
 	int blue;
-	servoPos = servoPos + increment;
 	
 	for(int i = 0; i < X_1; i++){
 		for(int j = 0; i < Y_1; j++) {
-			red = img[i*X_1+j*Y_1];
-			blue = img[i*X_1+j*Y_1+1];
+			red = img[i*X_1+j*3];
+			blue = img[i*X_1+j*3+2];
 			if (red > 190 && blue < 40) numRed++;
 			if(numRed == redThreshhold) return numRed;
+		}
+	}
+	
+	return numRed;
+	
+}
+
+int scanForRed(BYTE img)
+{
+	int numRed = 0;
+	int red;
+	int blue;
+	servoPos = servoPos + increment;
+	SERVOSet(1, servoPos);
+	
+	for(int i = 0; i < X_1; i++){
+		for(int j = 0; i < Y_1; j++) {
+			red = img[i*X_1+j*3];
+			blue = img[i*X_1+j*3+2];
+			if (red > 190 && blue < 40) numRed++;
 		}
 	}
 		
