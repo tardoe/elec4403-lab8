@@ -33,8 +33,6 @@ int redFoundServoPosition = 0;
 
 void setup()
 {
-	SERVOSet(1,servoPos);
-	
 	//mark this location as home
 	VWGetPosition(&homeLocationX, &homeLocationY, &homeLocatoinPhi);
 
@@ -132,6 +130,14 @@ int drivingWait()
 	}
 }
 
+int getFrontDistance()
+{
+	int dist = PSDGet(2);
+	int mmDist = 97.19 * exp(-0.053 * dist);
+
+	return mmDist;
+}
+
 void searchState()
 {
 	while(true)
@@ -147,8 +153,7 @@ void searchState()
 		}
 
 		//check how close the nearest object is.
-		int dist = PSDGet(2);
-		int mmDist = 97.19 * exp(-0.053 * dist);
+		int mmDist = getFrontDistance();
 
 		if(mmDist < 100)	//only get 10cm away
 		{
@@ -182,10 +187,7 @@ void targetingState()
 		}
 	}
 
-	// we should now have the global variable containing the servo position for the most red in the global variable.
-	
-
-	//we have a servo position - we need to make a drive turn adjustment.
+	// we should now have the global variable containing the servo position for the most red.
 	int angle = 0;
 
 
@@ -205,14 +207,27 @@ void targetingState()
 	}
 
 	VWTurn(angle, 100);
-	whileDriving();
+	drivingWait();
+
+
+	//we should now be facing the red can, do a distance check.
+	int mmDist = getFrontDistance();
 
 	// when distance is close enough (~5cm or so),
-		// turn on electromagnet and drive the remaining distance.
+	if(mmDist > 50)
+	{
+		//drive the difference
+		VWStraight(mmDist - 50, 100)
+		drivingWait();
+	}
+
+	
+	// turn on electromagnet and drive the remaining distance.
+	// magentOn();
+
 
 	// when confirmed that magnet is on, change state.
 	currentState = RETURNING_STATE;
-
 
 }
 
