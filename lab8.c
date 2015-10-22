@@ -1,6 +1,7 @@
 #include "eyebot.h"
 #include <math.h>
 #include <stdio.h>
+#include <bool.h>
 
 #define SEARCH_STATE 0
 #define TARGETING_STATE 1
@@ -14,7 +15,15 @@ int currentState = 0;
 
 bool redFound = false;
 
-BYTE *currentImage;
+//BYTE *currentImage;
+
+int servoPos = 0;
+SERVOSet(1, servoPos);
+int increment = 1;
+BYTE img[QVGA_SIZE];
+CAMInit(QVGA);
+//float Hue[X_1*Y_1], Set[X_1*Y_1, Int[X_1*Y_1]];
+int redThreshhold = 200;
 
 
 void setup()
@@ -26,9 +35,26 @@ void setup()
 	currentState = 0;
 }
 
-void searchForRed()
+int searchForRed(BYTE img)
 {
-
+	int numRed = 0;
+	int red;
+	int blue;
+	servoPos = servoPos + increment;
+	
+	for(int i = 0; i < X_1; i++){
+		for(int j = 0; i < Y_1; j++) {
+			red = img[i*X_1+j*Y_1];
+			blue = img[i*X_1+j*Y_1+1];
+			if (red > 190 && blue < 40) numRed++;
+			if(numRed == redThreshhold) return numRed;
+		}
+	}
+		
+	if (servoPos == 255 || servoPos == 0) increment = increment * -1;
+	
+	return numRed;
+	
 }
 
 int whileDriving()
