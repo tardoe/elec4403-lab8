@@ -52,7 +52,7 @@ int searchForRed(BYTE img)
 	int blue;
 	
 	for(int i = 0; i < X_1; i++){
-		for(int j = 0; i < Y_1; j++) {
+		for(int j = 0; j < Y_1; j++) {
 			red = img[(i+j*X_1)*3];
 			blue = img[(i+j*X_1)*3+2];
 			if (red > 190 && blue < 40) numRed++;
