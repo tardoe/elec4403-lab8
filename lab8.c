@@ -7,21 +7,24 @@
 #define TARGETING_STATE 1
 #define RETURNING_STATE 2
 
+
+#define RED_PIXEL_THRESHOLD 200
+
 int homeLocationX = 0;
 int homeLocationY = 0;
 int homeLocatoinPhi = 0;
 
 int currentState = 0;
 
-bool redFound = false;
+int redFound = 0;
+bool redMaximised = false;
 
 //BYTE *currentImage;
 
 int servoPos = 128;
-SERVOSet(1, servoPos);
 int increment = 1;
 BYTE img[QVGA_SIZE];
-CAMInit(QVGA);
+
 //float Hue[X_1*Y_1], Set[X_1*Y_1, Int[X_1*Y_1]];
 int redThreshhold = 200;
 
@@ -37,6 +40,9 @@ void setup()
 
 	//do any other initialisation
 	currentState = 0;
+
+	CAMInit(QVGA);
+	SERVOSet(1, servoPos);
 }
 
 int searchForRed(BYTE img)
@@ -96,11 +102,13 @@ int whileDriving()
 	while(!VWDriveDone())
 	{
 		//search for the red cans
-		redFound = searchForRed();
+		BYTE image;
+		CAMGet(&image);
 
-		//error condition
 
-		if(redFound)
+		redFound = searchForRed(image);
+
+		if(redFound > RED_PIXEL_THRESHOLD)
 		{
 			currentState = TARGETING_STATE;
 			break;
@@ -160,10 +168,22 @@ void searchState()
 void targetingState()
 {
 	//red was found, use the servo on the camera to sweep and find the best direction.
+	int maxRed = 0;
 
+	for(int i = 0; i < 255; i++)
+	{
+		BYTES *image;
+		CAMGet(&image);
+		int numRed = scanForRed(image);
 
+		if(numRed > maxRed)
+		{
+			maxRed = numRed;
+		}
+	}
+
+	// we should now have the global variable containing the servo position for the most red in the global variable.
 	
-
 
 	//we have a servo position - we need to make a drive turn adjustment.
 	int angle = 0;
