@@ -16,6 +16,8 @@ bool redFound = false;
 
 BYTE *currentImage;
 
+int redFoundServoPosition = 0;
+
 
 void setup()
 {
@@ -106,9 +108,33 @@ void searchState()
 
 void targetingState()
 {
-	//red was found, use the currentImage to work out where it is roughly and set a course towards it.
+	//red was found, use the servo on the camera to sweep and find the best direction.
 
-	// some kind of continual correct is required here.
+
+	
+
+
+	//we have a servo position - we need to make a drive turn adjustment.
+	int angle = 0;
+
+
+	if(redFoundServoPosition == 128)
+	{
+		angle = 0;
+
+	}
+	else if(redFoundServoPosition < 128)
+	{
+		angle = 128 / 90 * redFoundServoPosition;
+		angle = 360 - angle;
+	}
+	else if(redFoundServoPosition > 128)
+	{
+		angle = 128 / 90 * redFoundServoPosition;
+	}
+
+	VWTurn(angle, 100);
+	whileDriving();
 
 	// when distance is close enough (~5cm or so),
 		// turn on electromagnet and drive the remaining distance.
@@ -127,7 +153,7 @@ void returningState()
 	VWSetPosition(homeLocationX, homeLocationY, homeLocatoinPhi);
 	drivingWait();
 
-	// do something to indicate that goal is completed.
+	// do something to indicate that goal is completed - i dunno... beep?
 
 
 }
